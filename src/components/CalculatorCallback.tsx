@@ -4,27 +4,37 @@ import ChildCallback from './ChildCallback';
 
 const CalculatorCallback = () => {
     const [count, setCount] = useState(0);
+    const [random, setRandom] = useState(0);
+    const [sign, setSign] = useState('+');
+    const [prev, setPrev] = useState(0);
     const [other, setOther] = useState(0);
+
     const getRandomNum = (): number  => {
-        const getNum = Math.floor(Math.random() * 10);
-        console.log(getNum)
-        return getNum
+        return Math.floor(Math.random() * 10);
     }
     const calc = useCallback((sign: string) => {
         const getNum = getRandomNum();
-        switch(sign) {
-            case '+': setCount((c) => c + getNum); break;
-            case '-': setCount((c) => c - getNum >= 0 ? c - getNum : 0); break;
-            case '/': setCount((c) => c / getNum >= 0 ? c / getNum : 0); break;
-            case '*': setCount((c) => c * getNum); break;
-        }
+        setRandom(getNum);
+        setSign(sign);
+        setCount((c) => {
+            setPrev(c);
+            switch(sign) {
+                case '+': return c + getNum;
+                case '-': return c - getNum;
+                case '/': return c / getNum;
+                case '*': return c * getNum;
+                default: return c;
+            }
+        });
     },[]);
     return (
         <>
             <div className="flex flex-col items-center p-6">
                 <h1 className="text-2xl text-blue-500 font-bold mb-4">CallBack Calculator</h1>
+                <div className="text-gray-500">Prev count: {prev}, Second random value for calculation: {random}</div>
+                <div>Operation: {prev} {sign} {random}</div>
                 <div className="mb-2">Count: {count}</div>
-                <div className="mb-2">Other count: {other}</div>
+                <div className="mb-2">Other count: {other} <span className='text-gray-500 font-bold'>(multiply and divide by 2, increment and decrement by 1)</span></div>
                 <div className="flex gap-2">
                     <h2 className="text-2xl text-blue-500 font-bold mb-4">Count panel</h2>
                     <ChildCallback calc={calc}/>
